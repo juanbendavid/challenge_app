@@ -1,4 +1,5 @@
 import 'package:challenge_app/models/models.dart';
+import 'package:challenge_app/widgets/card_review.dart';
 import 'package:flutter/material.dart';
 
 class DetailPage extends StatelessWidget {
@@ -51,6 +52,9 @@ class _ProductDetail extends StatelessWidget {
               width: 10,
             ),
             RawChip(
+              onPressed: () {
+                showReviewsModal(context, product.reviews);
+              },
               label: Text(
                 "${product.reviews.length} reviews",
               ),
@@ -172,4 +176,58 @@ class _CustomSliverAppBar extends StatelessWidget {
     );
   }
 }
+
+
+void showReviewsModal(BuildContext context, List<Review> reviews) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) {
+      return DraggableScrollableSheet(
+        expand: false,
+        maxChildSize: 0.9,
+        initialChildSize: 0.7,
+        builder: (context, scrollController) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Text(
+                  'User Reviews',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: ListView.builder(
+                    controller: scrollController,
+                    itemCount: reviews.length,
+                    itemBuilder: (context, index) {
+                      final review = reviews[index];
+                      return CardReview(review: review);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+
+
 
