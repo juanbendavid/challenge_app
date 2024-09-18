@@ -7,7 +7,6 @@ class DetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final Product product =
         ModalRoute.of(context)!.settings.arguments as Product;
 
@@ -16,9 +15,12 @@ class DetailPage extends StatelessWidget {
         slivers: [
           _CustomSliverAppBar(product: product),
           SliverList(
-              delegate: SliverChildBuilderDelegate(
-                  (context, index) => _ProductDetail(product: product),
-                  childCount: 3))
+            delegate: SliverChildListDelegate(
+              [
+                _ProductDetail(product: product),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -28,101 +30,189 @@ class DetailPage extends StatelessWidget {
 class _ProductDetail extends StatelessWidget {
   final Product product;
   const _ProductDetail({super.key, required this.product});
+
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     final textStyle = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _reviewSection(product: product, textStyle: textStyle),
+          const SizedBox(height: 16),
+          _productInfo(product: product, textStyle: textStyle),
+          const SizedBox(height: 16),
+          _tagSection(product: product),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _productInfo(
+      {required Product product, required TextTheme textStyle}) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text(
+          product.title,
+          style:
+              textStyle.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          product.description,
+          style: textStyle.bodyMedium,
+        ),
+        const SizedBox(height: 16),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            IconButton(
-              icon: const Icon(
-                Icons.star,
-                color: Colors.orange,
-              ),
-              onPressed: () {},
-            ),
             Text(
-              product.rating.toString(),
-              style: textStyle.titleSmall
-                  ?.copyWith(color: Colors.orange, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            RawChip(
-              onPressed: () {
-                showReviewsModal(context, product.reviews);
-              },
-              label: Text(
-                "${product.reviews.length} reviews",
-              ),
-              labelStyle: const TextStyle(
-                color: Colors.black,
-                fontSize: 11,
+              "\$${((product.price * (product.discountPercentage / 100)).toStringAsFixed(2))}",
+              style: textStyle.headlineSmall?.copyWith(
+                color: Colors.green,
                 fontWeight: FontWeight.bold,
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
-              backgroundColor: Colors.grey.withOpacity(0.3),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              side: const BorderSide(color: Colors.transparent), // Elimina el borde
-            )
+            ),
+            Text(
+              "In Stock: ${product.stock}",
+              style: textStyle.bodyMedium,
+            ),
           ],
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-          child: Row(
-            children: [
-              // starts and review count
+        // real price with discount
+        const SizedBox(height: 8),
 
-              // ClipRRect(
-              //   borderRadius: BorderRadius.circular(10),
-              //   child: Image.network(
-              //       product.images.firstOrNull ??
-              //           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcs7QeC2_kP0lJEj7Q25mpHyeNkLt_oQ43uP2_jLnhozFShnw-Mba_ataiwQd_W1aByyU&usqp=CAU',
-              //       width: size.width * 0.3),
-              // ),
-              const SizedBox(
-                width: 12,
+        Row(
+          children: [
+            Text(
+              "Sale price ",
+              style: textStyle.bodyMedium?.copyWith(
+                color: Colors.grey,
               ),
-              Expanded(
-                child: SizedBox(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        product.title,
-                        style: textStyle.titleLarge,
-                      ),
-                      Text(product.description)
-                    ],
-                  ),
-                ),
+            ),
+            Text(
+              "sale price \$${product.price.toString()}",
+              style: textStyle.bodyMedium?.copyWith(
+                color: Colors.grey,
+                decoration: TextDecoration.lineThrough,
               ),
-            ],
+            ),
+            Text(
+              " (-${product.discountPercentage}%)",
+              style: textStyle.bodyMedium?.copyWith(
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Text(
+          "Brand: ${product.brand}",
+          style: textStyle.bodyMedium,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "SKU: ${product.sku}",
+          style: textStyle.bodyMedium,
+        ),
+        const SizedBox(height: 16),
+        Text(
+          "Weight: ${product.weight} g",
+          style: textStyle.bodyMedium,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "Dimensions: ${product.dimensions.width} x ${product.dimensions.height} x ${product.dimensions.depth} cm",
+          style: textStyle.bodyMedium,
+        ),
+        const SizedBox(height: 16),
+        Text(
+          "Warranty Information: ${product.warrantyInformation}",
+          style: textStyle.bodyMedium,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "Shipping Information: ${product.shippingInformation}",
+          style: textStyle.bodyMedium,
+        ),
+        const SizedBox(height: 16),
+        Text(
+          "Return Policy: ${product.returnPolicy}",
+          style: textStyle.bodyMedium,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "Minimum Order Quantity: ${product.minimumOrderQuantity}",
+          style: textStyle.bodyMedium,
+        ),
+      ],
+    );
+  }
+
+  Widget _tagSection({required Product product}) {
+    return Wrap(
+      spacing: 8,
+      children: product.tags.map((tag) {
+        return Chip(
+          label: Text(tag),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Wrap(
-            children: [
-              ...product.tags.map((gender) => Container(
-                    margin: const EdgeInsets.only(right: 10),
-                    child: Chip(
-                      label: Text(gender),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                    ),
-                  ))
-            ],
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _reviewSection extends StatelessWidget {
+  const _reviewSection({
+    super.key,
+    required this.product,
+    required this.textStyle,
+  });
+
+  final Product product;
+  final TextTheme textStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        IconButton(
+          icon: const Icon(
+            Icons.star,
+            color: Colors.orange,
           ),
+          onPressed: () {},
         ),
-        const SizedBox(
-          height: 100,
+        Text(
+          product.rating.toString(),
+          style: textStyle.titleSmall
+              ?.copyWith(color: Colors.orange, fontWeight: FontWeight.bold),
         ),
+        const SizedBox(width: 10),
+        RawChip(
+          onPressed: () {
+            showReviewsModal(context, product.reviews);
+          },
+          label: Text(
+            "${product.reviews.length} reviews",
+          ),
+          labelStyle: const TextStyle(
+            color: Colors.black,
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+          backgroundColor: Colors.grey.withOpacity(0.3),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          side: const BorderSide(color: Colors.transparent), // Elimina el borde
+        )
       ],
     );
   }
@@ -135,7 +225,7 @@ class _CustomSliverAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return SliverAppBar(
-      leading: IconButton.filled(
+      leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new),
         iconSize: 18,
         onPressed: () {
@@ -143,46 +233,32 @@ class _CustomSliverAppBar extends StatelessWidget {
         },
       ),
       actions: [
-        IconButton.filled(
-          icon: const Icon(Icons.favorite),
-          iconSize: 18,
+        IconButton(
+          icon: const Icon(Icons.favorite_border),
+          iconSize: 24,
           onPressed: () {
-            Navigator.pop(context);
+            // Acción favorita
           },
         ),
       ],
-      foregroundColor: Colors.red,
-      backgroundColor: Colors.grey.withOpacity(0.3),
+      backgroundColor: Colors.white,
       expandedHeight: size.height * 0.4,
       flexibleSpace: FlexibleSpaceBar(
-        // titlePadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        // title: Text(
-        //   product.title,
-        //   style: const TextStyle(fontSize: 20),
-        //   textAlign: TextAlign.start,
-        // ),
-        background: Stack(
-          children: [
-            SizedBox.expand(
-              child: Image.network(
-                product.images.firstOrNull ??
-                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcs7QeC2_kP0lJEj7Q25mpHyeNkLt_oQ43uP2_jLnhozFShnw-Mba_ataiwQd_W1aByyU&usqp=CAU',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ],
+        background: Image.network(
+          product.images.firstOrNull ?? 'https://via.placeholder.com/150',
+          fit: BoxFit.cover,
         ),
       ),
     );
   }
 }
 
-
+// Modal para mostrar las reseñas
 void showReviewsModal(BuildContext context, List<Review> reviews) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    shape: RoundedRectangleBorder(
+    shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
     builder: (context) {
@@ -227,7 +303,3 @@ void showReviewsModal(BuildContext context, List<Review> reviews) {
     },
   );
 }
-
-
-
-
