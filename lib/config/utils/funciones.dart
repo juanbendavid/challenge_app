@@ -7,6 +7,7 @@ class ProductUtils {
   }
 
   static String getCalculatedPriceWithDiscount(double price, double discountPercentage) {
-    return (price * discountPercentage/100).toStringAsFixed(2);
+    final discount = price * (discountPercentage / 100);
+    return (price - discount).toStringAsFixed(2);
   }
 }
