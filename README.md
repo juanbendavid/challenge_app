@@ -14,6 +14,13 @@
 
 ---
 
+## Capturas 🚀
+<p align="center">
+  <!-- TODO update gif to show icon in `overlay` -->
+  <img width="300" height="600" src="[https://media.giphy.com/media/f9SzoZKqo1vfdlCaT5/giphy.gif](https://github.com/juanbendavid/challenge_app/blob/main/image.png)">
+</p>
+
+
 ## Empezando 🚀
 
 Sigue estos pasos para configurar y ejecutar la aplicación Flutter en tu entorno de desarrollo local.
