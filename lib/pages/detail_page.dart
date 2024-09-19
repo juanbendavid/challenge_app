@@ -1,3 +1,4 @@
+import 'package:challenge_app/config/utils/funciones.dart';
 import 'package:challenge_app/models/models.dart';
 import 'package:challenge_app/widgets/card_review.dart';
 import 'package:flutter/material.dart';
@@ -70,7 +71,7 @@ class _ProductDetail extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "\$${((product.price * (product.discountPercentage / 100)).toStringAsFixed(2))}",
+              "\$${ProductUtils.getCalculatedPriceWithDiscount(product.price, product.discountPercentage)}",
               style: textStyle.headlineSmall?.copyWith(
                 color: Colors.green,
                 fontWeight: FontWeight.bold,

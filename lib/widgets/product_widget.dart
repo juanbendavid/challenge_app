@@ -1,4 +1,5 @@
 
+import 'package:challenge_app/config/utils/funciones.dart';
 import 'package:challenge_app/models/models.dart';
 import 'package:flutter/material.dart';
 
@@ -43,7 +44,7 @@ class ProductWidget extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "\$${product.price.toString()}",
+                    "\$${ProductUtils.getCalculatedPriceWithDiscount(product.price, product.discountPercentage)}",
                     style: const TextStyle(
                         fontSize: 15, fontWeight: FontWeight.w300),
                   ),

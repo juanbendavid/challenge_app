@@ -1,4 +1,4 @@
-import 'package:challenge_app/config/theme/funciones.dart';
+import 'package:challenge_app/config/utils/funciones.dart';
 import 'package:challenge_app/models/models.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +30,7 @@ class CardReview extends StatelessWidget {
                     ),
               ),
               Text(
-                formatDate(review.date),
+                ProductUtils.getFormattedDate(review.date),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
