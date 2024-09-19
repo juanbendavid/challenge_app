@@ -13,6 +13,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Future<List<Product>> _loadData;
+
   @override
   void initState() {
     super.initState();
@@ -23,7 +24,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Ecomerce App"),
+        title: const Text("Ecommerce App"),
       ),
       body: RefreshIndicator.adaptive(
         onRefresh: () async {
@@ -32,15 +33,39 @@ class _HomePageState extends State<HomePage> {
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: FutureBuilder(
+          child: FutureBuilder<List<Product>>(
             future: _loadData,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
                   child: CircularProgressIndicator.adaptive(),
                 );
-              } else if (snapshot.connectionState == ConnectionState.done) {
-                final products = snapshot.data as List<Product>;
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error, color: Colors.red, size: 50),
+                      const SizedBox(height: 16),
+                      Text(
+                        '${snapshot.error}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _loadData = loadData();
+                          });
+                        },
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                );
+              } else if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                final products = snapshot.data!;
                 return GridView.builder(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
@@ -50,15 +75,16 @@ class _HomePageState extends State<HomePage> {
                   itemBuilder: (context, index) {
                     final product = products[index];
                     return ProductWidget(
-                        product: product,
-                        onTap: () {
-                          Navigator.pushNamed(context, '/detail', arguments: product);
-                        });
+                      product: product,
+                      onTap: () {
+                        Navigator.pushNamed(context, '/detail', arguments: product);
+                      },
+                    );
                   },
                 );
               }
               return const Center(
-                child: Text("Error"),
+                child: Text("No products available"),
               );
             },
           ),

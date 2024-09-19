@@ -9,13 +9,8 @@ class ProductProvider extends ChangeNotifier {
   List<Product> get products => _products;
 
   Future<List<Product>> fetchProducts() async {
-    try {
-      final data = await _apiService.listarFacturas();
-      _products = data.products;
-      return _products;
-      notifyListeners();
-    } on DioException catch (e) {
-      throw e;
-    }
+    final data = await _apiService.getProducts();
+    _products = data.products;
+    return _products;
   }
 }
