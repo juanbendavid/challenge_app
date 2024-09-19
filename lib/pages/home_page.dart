@@ -12,12 +12,35 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Future<List<Product>> _loadData;
+  late ScrollController _scrollController;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
-    _loadData = loadData();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+    Provider.of<ProductProvider>(context, listen: false).fetchProducts();
+  }
+
+  void _onScroll() async {
+    if (_scrollController.position.pixels >=
+        (_scrollController.position.maxScrollExtent - 100)) {
+      final productProvider =
+          Provider.of<ProductProvider>(context, listen: false);
+      if (!_isLoading) {
+        setState(() => _isLoading = true);
+        await productProvider.fetchProducts(loadMore: true);
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -28,72 +51,56 @@ class _HomePageState extends State<HomePage> {
       ),
       body: RefreshIndicator.adaptive(
         onRefresh: () async {
-          _loadData = loadData();
-          setState(() {});
+          final productProvider =
+              Provider.of<ProductProvider>(context, listen: false);
+          productProvider.refreshProducts();
+          productProvider.fetchProducts();
         },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: FutureBuilder<List<Product>>(
-            future: _loadData,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator.adaptive(),
-                );
-              } else if (snapshot.hasError) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error, color: Colors.red, size: 50),
-                      const SizedBox(height: 16),
-                      Text(
-                        '${snapshot.error}',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            _loadData = loadData();
-                          });
-                        },
-                        child: const Text('Retry'),
-                      ),
-                    ],
-                  ),
-                );
-              } else if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-                final products = snapshot.data!;
-                return GridView.builder(
+        child: Consumer<ProductProvider>(
+          builder: (context, productProvider, child) {
+            if (productProvider.products.isEmpty) {
+              return const Center(
+                child: CircularProgressIndicator.adaptive(),
+              );
+            }
+
+            return Stack(
+              children: [
+                GridView.builder(
+                  controller: _scrollController,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     childAspectRatio: 0.7,
                   ),
-                  itemCount: products.length,
+                  itemCount: productProvider.products.length,
                   itemBuilder: (context, index) {
-                    final product = products[index];
+                    final product = productProvider.products[index];
                     return ProductWidget(
                       product: product,
                       onTap: () {
-                        Navigator.pushNamed(context, '/detail', arguments: product);
+                        Navigator.pushNamed(context, '/detail',
+                            arguments: product);
                       },
                     );
                   },
-                );
-              }
-              return const Center(
-                child: Text("No products available"),
-              );
-            },
-          ),
+                ),
+                if (_isLoading)
+                  const Positioned(
+                    bottom: 15,
+                    left: 0,
+                    right: 0,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
         ),
       ),
     );
-  }
-
-  Future<List<Product>> loadData() {
-    return Provider.of<ProductProvider>(context, listen: false).fetchProducts();
   }
 }
