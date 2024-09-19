@@ -16,8 +16,14 @@
 
 ## Capturas 🚀
 <p align="center">
-  <!-- TODO update gif to show icon in `overlay` -->
   <img width="300" height="600" src="https://github.com/juanbendavid/challenge_app/blob/main/assets/img1.jpg?raw=true">
+  <img width="300" height="600" src="https://github.com/juanbendavid/challenge_app/blob/main/assets/img3.png?raw=true">
+  <img width="300" height="600" src="https://github.com/juanbendavid/challenge_app/blob/main/assets/img5.png?raw=true">
+</p>
+<p align="center">
+  <img width="300" height="600" src="https://github.com/juanbendavid/challenge_app/blob/main/assets/video1.gif">
+  <img width="300" height="600" src="https://github.com/juanbendavid/challenge_app/blob/main/assets/video3.gif">
+
 </p>
 
 
