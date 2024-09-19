@@ -245,9 +245,30 @@ class _CustomSliverAppBar extends StatelessWidget {
       backgroundColor: Colors.white,
       expandedHeight: size.height * 0.4,
       flexibleSpace: FlexibleSpaceBar(
-        background: Image.network(
-          product.images.firstOrNull ?? 'https://via.placeholder.com/150',
-          fit: BoxFit.cover,
+        background: Hero(
+          tag: product.title,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.network(
+                product.thumbnail,
+                fit: BoxFit.cover,
+              ),
+              Image.network(
+                product.images.first,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator.adaptive(),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
