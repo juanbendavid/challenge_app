@@ -85,6 +85,7 @@ El proyecto cuenta con pruebas de widgets y unitarias para asegurar la calidad d
 - **Implementar Go Router**: Para mejorar la navegación dentro de la aplicación.
 - **Implementar inyección de dependencias**: Para mejorar la modularidad y mantenibilidad del código.
 - **Recordar productos favoritos**: Implementar la funcionalidad de favoritos para recordar las preferencias de los usuarios.
+- **Sección de Categorias**: Implementar una lista seleccionable de las categorias disponibles.
 
 ---
 
