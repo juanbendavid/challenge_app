@@ -10,10 +10,10 @@ void main() {
     });
 
     test('getCalculatedPriceWithDiscount returns correct value', () {
-      const price =  9.99;
-      const discount = 7.17; 
+      const price =  19.99;
+      const discount = 5.5; 
       final result = ProductUtils.getCalculatedPriceWithDiscount(price, discount);
-      expect(result, "0.72");
+      expect(result, "18.89");
     });
   });
 }
