@@ -17,7 +17,7 @@
 ## Capturas 🚀
 <p align="center">
   <!-- TODO update gif to show icon in `overlay` -->
-  <img width="300" height="600" src="[https://media.giphy.com/media/f9SzoZKqo1vfdlCaT5/giphy.gif](https://github.com/juanbendavid/challenge_app/blob/main/image.png)">
+  <img width="300" height="600" src="https://github.com/juanbendavid/challenge_app/blob/main/assets/img1.jpg?raw=true">
 </p>
 
 
