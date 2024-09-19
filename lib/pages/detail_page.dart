@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:challenge_app/config/utils/funciones.dart';
 import 'package:challenge_app/models/models.dart';
 import 'package:challenge_app/widgets/card_review.dart';
@@ -110,6 +111,7 @@ class _ProductDetail extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
+        if(product.brand != null)
         Text(
           "Brand: ${product.brand}",
           style: textStyle.bodyMedium,
@@ -222,6 +224,7 @@ class _reviewSection extends StatelessWidget {
 class _CustomSliverAppBar extends StatelessWidget {
   final Product product;
   const _CustomSliverAppBar({super.key, required this.product});
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -247,31 +250,62 @@ class _CustomSliverAppBar extends StatelessWidget {
       flexibleSpace: FlexibleSpaceBar(
         background: Hero(
           tag: product.title,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Image.network(
-                product.thumbnail,
-                fit: BoxFit.cover,
-              ),
-              Image.network(
-                product.images.first,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) {
-                    return child;
-                  } else {
-                    return const Center(
-                      child: CircularProgressIndicator.adaptive(),
+          child: FutureBuilder(
+            future: _preloadImages(product.images, context),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                // Mostrar el thumbnail mientras se cargan las imágenes
+                return Image.network(
+                  product.thumbnail,
+                  fit: BoxFit.cover,
+                  width: size.width,
+                );
+              } else {
+                // Mostrar el carrusel de imágenes una vez cargadas
+                return CarouselSlider(
+                  options: CarouselOptions(
+                    height: size.height * 0.4,
+                    viewportFraction: 1.0,
+                    enlargeCenterPage: false,
+                    enableInfiniteScroll: product.images.length > 1,
+                    autoPlay: true,
+                    autoPlayInterval: const Duration(seconds: 3),
+                  ),
+                  items: product.images.map((imageUrl) {
+                    return Builder(
+                      builder: (BuildContext context) {
+                        return Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          width: size.width,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) {
+                              return child;
+                            } else {
+                              return const Center(
+                                child: CircularProgressIndicator.adaptive(
+                                  strokeWidth: 2,
+                                ),
+                              );
+                            }
+                          },
+                        );
+                      },
                     );
-                  }
-                },
-              ),
-            ],
+                  }).toList(),
+                );
+              }
+            },
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _preloadImages(List<String> imageUrls, context) async {
+    for (String url in imageUrls) {
+      await precacheImage(NetworkImage(url), context);
+    }
   }
 }
 
